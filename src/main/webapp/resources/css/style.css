@@ -1,0 +1,12 @@
+
+@import "home.css";
+
+
+
+* {
+	box-sizing: border-box;
+}
+
+body {
+	background-color: #eaeaea;
+}

@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC 	
+		"-//mybatis.org//DTD Mapper 3.0//EN" 
+		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+		
+<mapper namespace="com.itbank.dao.StudyDAO">
+	<select id="selectAllStudies" resultType="StudyVO">
+		select * from team 
+			order by teamid asc
+	</select>
+	
+	<insert id="insertStudy" parameterType="StudyVO">
+		insert into team 
+		(TEAMNAME, TEAMINFO, TEAMPUBLIC, TEAMPICTURE, DELEGATE) 
+			values (#{teamName}, #{teamInfo}, #{teamPublic}, #{teamPicture}, #{delegate})
+	</insert>
+	
+	<select id="selectSeq" resultType="int">
+	select max(teamid) from team
+	</select>
+
+	<!-- 스터디 회원가입, 스터디 생성 -->
+	<insert id="memberTeamInsert" parameterType="com.itbank.vo.MemberTeamVO">
+		insert into memberteam(memberid, teamid) values(#{memberId}, #{teamId})
+	</insert>
+	
+	<select id="selectMemberStudies" parameterType="int" resultType="StudyVO">
+		select team.* from memberteam 
+			join team on team.teamid = memberteam.teamid
+			where memberteam.memberid = #{memberId}
+	</select>
+	
+	<select id="selectStudy" resultType="StudyVO" parameterType="int">
+		select * from team where teamid = #{teamId}
+	</select>
+	
+<!-- 승인신청 대기 -->
+	<insert id="waitingTeam" parameterType="com.itbank.vo.MemberTeamVO">
+		insert into waiting(memberid, teamid) values(#{memberId}, #{teamId})
+	</insert>
+
+	<select id="team" parameterType="int" resultType="StudyVO">
+
+		select *from team where teamid = #{teamId}
+	</select>
+
+	<update id="toggleChange" parameterType="StudyVO">
+		update team set teampublic = #{teamPublic} where teamid = #{teamId}
+	</update>
+	
+	<update id="studyDelete" parameterType="StudyVO" >
+
+	update team set deletetime =#{deleteTime} where teamid = #{teamId}
+
+	</update>
+
+	<update id="schedule" parameterType="String">
+	update team set deletetime = '삭제완료' where deletetime = #{deleteChkTime}
+	</update>
+
+	<select id="studydeleteChk" resultType="StudyVO" parameterType="int">
+		select *from team where teamid=#{teamId}
+	</select>
+	
+	<!-- main페이지 스터디 검색 -->
+	<select id="searchedByName" parameterType="String" resultType="StudyVO">
+		select * from team where TEAMNAME like '%' ||#{query}||'%' order by teamname asc
+	</select>
+	
+	<select id="searchedByTag" resultType="StudyVO" parameterType="int">
+		select team.* from teamtag
+			join team on team.teamid = teamtag.teamid
+			where teamtag.tagid = #{tagId}
+	</select>
+	
+	<!-- 태그 추가 -->
+	<select id="selectTagAll" resultType="com.itbank.vo.TagVO">
+		select * from tag
+	</select>
+	
+	<insert id="insertTag" parameterType="String">
+		insert into tag (TAGNAME) values (#{tagName})
+	</insert>
+	
+	<select id="maxTagNum" resultType="int">
+		select max(tagid) from tag
+	</select>
+	
+	<insert id="insertTeamTag">
+		insert into TEAMTAG (TEAMID, TAGID) values (#{teamId}, #{tagId})
+	</insert>
+	
+	<select id="selectTag" parameterType="String" resultType="com.itbank.vo.TagVO">
+		select * from tag where TAGNAME = #{tagName}
+	</select>
+	
+	<select id="selectStudyTag" parameterType="int" resultType="com.itbank.vo.TagVO">
+		select tag.* from teamtag 
+			join tag on tag.tagid = teamtag.tagid
+			where teamtag.teamid = #{teamId}
+	</select>
+	
+</mapper>
+		
